@@ -44,7 +44,7 @@ func modifiedQuickSort(arr []int, low, high int) {
 }
 
 func main() {
-	// 生成测试数据
+	// 生成两份相同的测试数据
 	w := 10000
 	dataSizes := []int{1 * w, 10 * w, 100 * w, 1000 * w}
 	testData, testDataCopy := make(map[int][]int), make(map[int][]int)
@@ -56,7 +56,7 @@ func main() {
 			testDataCopy[size] = append(testDataCopy[size], val)
 		}
 	}
-	for _, size := range dataSizes {
+	for _, size := range dataSizes { // 测试
 		// 测试修改后的快速排序
 		start := time.Now()
 		modifiedQuickSort(testData[size], 0, size-1)
@@ -69,5 +69,4 @@ func main() {
 		sort.Ints(testDataCopy[size])
 		fmt.Println("data size", size/w, "w, lib sort: ", time.Now().Sub(start))
 	}
-
 }
