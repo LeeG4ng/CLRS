@@ -39,7 +39,7 @@ func quickSort(arr []int, low, high, k int) {
 }
 
 func modifiedQuickSort(arr []int, low, high int) {
-	quickSort(arr, low, high, 50)
+	quickSort(arr, low, high, 12)
 	insertionSort(arr)
 }
 
