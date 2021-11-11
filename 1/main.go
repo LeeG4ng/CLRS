@@ -15,6 +15,7 @@ func insertionSort(array []int) {
 		}
 	}
 }
+
 func partition(arr []int, low, high int) int {
 	pivot := arr[high]
 	i := low
@@ -45,7 +46,7 @@ func modifiedQuickSort(arr []int, low, high int) {
 func main() {
 	// 生成测试数据
 	w := 10000
-	dataSizes := []int{1*w, 10*w, 100*w, 1000*w}
+	dataSizes := []int{1 * w, 10 * w, 100 * w, 1000 * w}
 	testData, testDataCopy := make(map[int][]int), make(map[int][]int)
 	rand.Seed(time.Now().UnixNano())
 	for _, size := range dataSizes {
@@ -58,7 +59,7 @@ func main() {
 	for _, size := range dataSizes {
 		// 测试修改后的快速排序
 		start := time.Now()
-		modifiedQuickSort(testData[size], 0, size - 1)
+		modifiedQuickSort(testData[size], 0, size-1)
 		fmt.Println("data size", size/w, "w, quicksort: ", time.Now().Sub(start))
 		if !sort.IntsAreSorted(testData[size]) {
 			fmt.Println("wrong")
