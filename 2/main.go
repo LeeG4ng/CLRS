@@ -17,7 +17,9 @@ type Point struct {
 }
 
 func distance(a, b Point) float64 {
-	return math.Sqrt(a.x*a.x + b.x*b.x)
+	dx := a.x - b.x
+	dy := a.y - b.y
+	return math.Sqrt(dx*dx + dy*dy)
 }
 
 func readFile(points *[]Point) {

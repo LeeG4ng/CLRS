@@ -164,7 +164,7 @@ func readFile() []int {
 }
 
 func printTree(t *RBTree) {
-	file, err := os.Create("3/tree.txt")
+	file, err := os.Create("3/LOT.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
