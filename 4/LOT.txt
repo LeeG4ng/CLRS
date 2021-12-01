@@ -1,0 +1,17 @@
+{30 32}, BLACK, 90
+{20 25}, RED, 28
+{50 60}, RED, 90
+{15 22}, BLACK, 22
+{25 28}, BLACK, 28
+{35 40}, BLACK, 40
+{70 90}, BLACK, 90
+nil
+nil
+nil
+nil
+{32 34}, RED, 34
+nil
+nil
+nil
+nil
+nil

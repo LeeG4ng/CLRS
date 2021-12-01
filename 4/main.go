@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+type interval struct {
+	low, high int
+}
+
 type color string
 
 const (
@@ -20,6 +24,9 @@ type TNode struct {
 	color          color
 	key            int
 	left, right, p *TNode
+
+	int interval
+	max int
 }
 
 type RBTree struct {
@@ -27,7 +34,7 @@ type RBTree struct {
 }
 
 func NewRBTree() *RBTree {
-	nilNode := TNode{BLACK, 0, nil, nil, nil}
+	nilNode := TNode{BLACK, 0, nil, nil, nil, interval{0, 0}, 0}
 	return &RBTree{
 		root: &nilNode,
 		nil:  &nilNode,
@@ -48,6 +55,10 @@ func (t *RBTree) LeftRotate(node *TNode) {
 	}
 	y.left = node
 	node.p = y
+
+	// !
+	y.max = node.max
+	node.max = max(node.int.high, node.left.max, node.right.max)
 }
 
 func (t *RBTree) RightRotate(node *TNode) {
@@ -64,6 +75,10 @@ func (t *RBTree) RightRotate(node *TNode) {
 	}
 	y.right = node
 	node.p = y
+
+	// !
+	y.max = node.max
+	node.max = max(node.int.high, node.left.max, node.right.max)
 }
 
 func (t *RBTree) Insert(z *TNode) {
@@ -75,6 +90,7 @@ func (t *RBTree) Insert(z *TNode) {
 		} else {
 			x = x.right
 		}
+		y.max = max(y.max, z.max) // !
 	}
 	// y为待插入节点的父节点
 	z.p = y
@@ -94,18 +110,15 @@ func (t *RBTree) InsertFixup(z *TNode) {
 		if z.p == z.p.p.left { // z.p是个左孩子
 			y := z.p.p.right    // y为z的叔节点
 			if y.color == RED { // case1：叔节点为红色
-				fmt.Println("case 1")
 				z.p.color = BLACK
 				y.color = BLACK   // z的父节点和叔节点改为黑色
 				z.p.p.color = RED // z.p.p改为红色
 				z = z.p.p         // z指向z.p.p，进入下次循环
 			} else {
 				if z == z.p.right { // case2：z是一个右孩子
-					fmt.Println("case 2")
 					z = z.p
 					t.LeftRotate(z)
 				} // case2结束进入case3
-				fmt.Println("case 3")
 				z.p.color = BLACK // case3：z是一个左孩子
 				z.p.p.color = RED // 交换p和p.p的颜色
 				t.RightRotate(z.p.p)
@@ -113,18 +126,15 @@ func (t *RBTree) InsertFixup(z *TNode) {
 		} else { // z.p是个右孩子
 			y := z.p.p.left     // y为z的叔节点
 			if y.color == RED { // case4：叔节点为红色
-				fmt.Println("case 4")
 				z.p.color = BLACK
 				y.color = BLACK   // z的父节点和叔节点改为黑色
 				z.p.p.color = RED // z.p.p改为红色
 				z = z.p.p         // z指向z.p.p，进入下次循环
 			} else {
 				if z == z.p.left { // case5：z是一个左孩子
-					fmt.Println("case 5")
 					z = z.p
 					t.RightRotate(z)
 				} // case5结束进入case6
-				fmt.Println("case 6")
 				z.p.color = BLACK // case6：z是一个右孩子
 				z.p.p.color = RED // 交换p和p.p的颜色
 				t.LeftRotate(z.p.p)
@@ -134,12 +144,12 @@ func (t *RBTree) InsertFixup(z *TNode) {
 	t.root.color = BLACK
 }
 
-func readFile() []int {
+func readFile() []interval {
 	var (
 		count int
-		data  []int
+		data  []interval
 	)
-	file, err := os.Open("3/insert.txt")
+	file, err := os.Open("4/insert.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -148,23 +158,20 @@ func readFile() []int {
 	fileScanner.Scan()
 	line := fileScanner.Text()
 	fmt.Sscanf(line, "%d", count)
-	fileScanner.Scan()
-	line = fileScanner.Text()
-	elements := strings.Fields(line)
-	for _, element := range elements {
-		n, err := strconv.Atoi(element)
-		if err != nil {
-			log.Fatal(err)
-		}
-		data = append(data, n)
+	for fileScanner.Scan() {
+		line = fileScanner.Text()
+		elements := strings.Fields(line)
+		low, _ := strconv.Atoi(elements[0])
+		high, _ := strconv.Atoi(elements[1])
+		data = append(data, interval{low, high})
 	}
-	fmt.Println("输入：", data)
 	file.Close()
+	fmt.Println("输入：", data)
 	return data
 }
 
 func printTree(t *RBTree) {
-	file, err := os.Create("3/LOT.txt")
+	file, err := os.Create("4/LOT.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -179,18 +186,62 @@ func printTree(t *RBTree) {
 			bufWriter.WriteString("nil\n")
 			continue
 		}
-		bufWriter.WriteString(fmt.Sprintf("%d, %s\n", node.key, node.color))
+		bufWriter.WriteString(fmt.Sprintf("%d, %s, %d\n", node.int, node.color, node.max))
 		q.Push(node.left)
 		q.Push(node.right)
 	}
 	bufWriter.Flush()
 }
 
+func (t *RBTree) intervalSearch(x *TNode, i interval) []interval {
+	var res []interval
+	if overlap(i, x.int) {
+		res = append(res, x.int)
+	}
+	if x.left != t.nil && x.left.max >= i.low {
+		res = append(res, t.intervalSearch(x.left, i)...)
+	}
+	if x.right != t.nil && x.right.max >= i.low && x.int.low <= i.high {
+		res = append(res, t.intervalSearch(x.right, i)...)
+	}
+	return res
+}
+
 func main() {
 	data := readFile()
 	t := NewRBTree()
-	for _, num := range data {
-		t.Insert(&TNode{RED, num, t.nil, t.nil, t.nil})
+	for _, interval := range data {
+		t.Insert(&TNode{
+			color: RED,
+			key:   interval.low,
+			left:  t.nil,
+			right: t.nil,
+			p:     t.nil,
+			int:   interval,
+			max:   interval.high,
+		})
 	}
 	printTree(t)
+
+	for {
+		fmt.Print("Input interval:")
+		var interval interval
+		fmt.Scanf("%d %d", &interval.low, &interval.high)
+		res := t.intervalSearch(t.root, interval)
+		fmt.Println(res)
+	}
+}
+
+func max(vals ...int) int {
+	max := vals[0]
+	for _, val := range vals {
+		if val > max {
+			max = val
+		}
+	}
+	return max
+}
+
+func overlap(i1, i2 interval) bool {
+	return i1.low <= i2.high && i2.low <= i1.high
 }
