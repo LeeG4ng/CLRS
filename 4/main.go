@@ -24,9 +24,8 @@ type TNode struct {
 	color          color
 	key            int
 	left, right, p *TNode
-
-	int interval
-	max int
+	int            interval
+	max            int
 }
 
 type RBTree struct {
