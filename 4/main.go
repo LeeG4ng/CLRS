@@ -24,9 +24,8 @@ type TNode struct {
 	color          color
 	key            int
 	left, right, p *TNode
-
-	int interval
-	max int
+	int            interval
+	max            int
 }
 
 type RBTree struct {
@@ -195,12 +194,15 @@ func printTree(t *RBTree) {
 
 func (t *RBTree) intervalSearch(x *TNode, i interval) []interval {
 	var res []interval
+	// 当前结点与i重叠，将其区间追加到res中
 	if overlap(i, x.int) {
 		res = append(res, x.int)
 	}
+	// 左子树的所有区间有与i重叠的可能，递归搜索左子树并将结果附加到res中
 	if x.left != t.nil && x.left.max >= i.low {
 		res = append(res, t.intervalSearch(x.left, i)...)
 	}
+	// 右子树的所有区间有与i重叠的可能，递归搜索右子树并将结果附加到res中
 	if x.right != t.nil && x.right.max >= i.low && x.int.low <= i.high {
 		res = append(res, t.intervalSearch(x.right, i)...)
 	}
