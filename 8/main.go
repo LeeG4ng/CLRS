@@ -16,7 +16,7 @@ const (
 type color int
 
 type VertexNode struct {
-	data      string
+	name      string
 	firstEdge *EdgeNode
 	color     color
 }
@@ -24,12 +24,11 @@ type VertexNode struct {
 type EdgeNode struct {
 	iVex, jVex   int
 	iLink, jLink *EdgeNode
-	status       int
 }
 
 type Graph struct {
-	vList      []VertexNode
-	vNum, eNum int
+	vList []VertexNode
+	vNum  int
 }
 
 func (g *Graph) InsertVertex(v string) {
@@ -41,11 +40,11 @@ func (g *Graph) InsertEdge(v1, v2 string) {
 	iVex, jVex := -1, -1
 	var iNode, jNode *VertexNode
 	for index, v := range g.vList {
-		if v1 == v.data {
+		if v1 == v.name {
 			iVex = index
 			iNode = &g.vList[index]
 		}
-		if v2 == v.data {
+		if v2 == v.name {
 			jVex = index
 			jNode = &g.vList[index]
 		}
@@ -79,7 +78,7 @@ func (g *Graph) adj(v int) (list []int) {
 
 func (g *Graph) BFS(s int) {
 	g.vList[s].color = GRAY
-	fmt.Print(g.vList[s].data)
+	fmt.Print(g.vList[s].name)
 	q := NewQueue()
 	q.Push(s)
 
@@ -88,7 +87,7 @@ func (g *Graph) BFS(s int) {
 		for _, v := range g.adj(u) {
 			if g.vList[v].color == WHITE {
 				g.vList[v].color = GRAY
-				fmt.Print("-", g.vList[v].data)
+				fmt.Print("-", g.vList[v].name)
 				q.Push(v)
 			}
 		}
@@ -107,7 +106,13 @@ func main() {
 		g.InsertEdge(p.v1, p.v2)
 	}
 
-	g.BFS(0)
+	//g.BFS(0)
+	for i := 0; i < g.vNum; i++ {
+		if g.vList[i].color == WHITE {
+			g.BFS(i)
+			fmt.Print("\n")
+		}
+	}
 }
 
 type pair struct {
