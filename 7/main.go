@@ -22,7 +22,7 @@ var (
 )
 
 func BackTrack(i int) { // 任务i取值为0,1,...,n-1
-	if i == n {
+	if i == n { // 叶结点
 		endTime := finishTime()
 		if endTime < bestEndTime {
 			bestEndTime = endTime
